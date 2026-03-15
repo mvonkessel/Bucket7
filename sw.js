@@ -1,0 +1,4 @@
+const C='bucket7-v11b',A=['./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting()});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});
+self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.hostname==='api.bigdatacloud.net'){e.respondWith(fetch(e.request));return}if(u.hostname.includes('googleapis')||u.hostname.includes('gstatic')){e.respondWith(caches.open(C).then(c=>c.match(e.request).then(h=>{const n=fetch(e.request).then(r=>{if(r.ok)c.put(e.request,r.clone());return r}).catch(()=>h);return h||n})));return}e.respondWith(caches.match(e.request).then(h=>h||fetch(e.request)))});
